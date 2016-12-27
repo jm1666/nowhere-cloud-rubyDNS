@@ -4,21 +4,25 @@
 
 [ ![Codeship Status for jm1666/nowhere-cloud-rubyDNS](https://app.codeship.com/projects/ff2b3060-adba-0134-3cb2-36e7a5ec89be/status?branch=master)](https://app.codeship.com/projects/192557)
 
-This Repository hosts a mini DNS Server, powered by ruby.
+This Repository hosts a mini DNS Server, powered by Ruby + MySQL.
 
-このリポジトリは、Ruby言語で書かれたDNSサーバが含まれています。
+このリポジトリは、Ruby言語で書かれ、RDBMSによって駆動されるDNSサーバが含まれています。
 
-此存儲庫包含一個使用Ruby編寫的迷你DNS Server。
+此存儲庫包含一個使用Ruby編寫及使用RDBMS作爲數據庫的迷你DNS Server。
 
 ---
 
 ### Requirements // システム必要条件 // 系統要求
 * Ruby >= 2.3.0 w/ Bundler
+* Any RDBMS supported by [Sequel ORM](http://sequel.jeremyevans.net/)
 * Linux (M$ Windows から残念です、申し訳ございません) (不支援 M$ Windows)
 
 ### How To use? // 使い方 (英語のみ) // 食用方法 (English Only)
-
-* *TODO*
+1. Configure your `DATABASE_URL` in `.env` or Environment Varibales, and your decided RDBMS Driver in `Gemfile`
+  * MySQL should use `mysql2`
+2. `$ bundler update`
+3. `$ rake db:migrate`
+4. `$ ruby dnsd.rb`
 
 ## License
 [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-nc-sa/4.0/)

@@ -1,6 +1,6 @@
 ## Proof of Concept: A DNS Server which can be updated via API.
-## 概念実証：DNSサーバの設計
-## 概念驗證：可動態更新的DNS Server設計
+## 概念実証：DNSサーバ
+## 概念驗證：可動態更新的DNS Server
 
 [ ![Codeship Status for jm1666/nowhere-cloud-rubyDNS](https://app.codeship.com/projects/ff2b3060-adba-0134-3cb2-36e7a5ec89be/status?branch=master)](https://app.codeship.com/projects/192557)
 
@@ -25,44 +25,46 @@ This Repository hosts a mini DNS Server, powered by Ruby + MySQL.
 4. Configure `DATABASE_URL` and various settings in `.env`
 3. `$ rake db:migrate`
 4. `$ ruby dnsd.rb`
-5. Open a new terminal, `$ rackup -p PORT`, Where PORT is any port number you like
+5. Open a new terminal, `$ rackup` to run the API Server. Default on port `9292`, append `-p 1234` to use port `1234`
 
 ![Screenshot](screenshot.png?raw=true)
 
-## License
+### License
 [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
-## Acknowledgements
+### Acknowledgements
 * Developers of [Ruby Sinatra](http://www.sinatrarb.com/)
 * [ioquatix](https://github.com/ioquatix/), who develops [RubyDNS](https://github.com/ioquatix/rubydns)
 
-## Documentations
-* [Broken rdoc](https://nowhere-cloud.github.io/ruby-dns/), if I have time I will deal with it.
+### Documentations
 * API
   * Basically, send this payload to `POST /records/new` to create
   ```json
   {
     "name": "hostname",
-    "ipv4address": "1.2.3.4"
+    "ipv4address": "192.0.2.4",
+    "ipv6address": "::FFFF:192.0.2.4"
   }
   ```
   * Get all records `GET /records`
-  * Update records `PATCH /records/n`, where `n` is record id
+  * Update records `PATCH /records/n`, where `n` is record id, No empty records, just leave the field you wanna update
   ```json
   {
     "name": "hostname",
-    "ipv4address": "1.2.3.4"
+    "ipv4address": "192.0.2.4",
+    "ipv6address": "::FFFF:192.0.2.4"
   }
   ```
   * Delete records `DELETE /records/n`, where `n` is record id
-  * Search by hostname `GET /search/name/abc`, where `abc` is hostname
-  * Search by IP `GET /search/ip/1.2.3.4`, where `1.2.3.4` is the recorded IP
+  * Search by hostname `GET /search/name/hostname`, where `abc` is hostname
+  * Search by IPv4 `GET /search/ip4/192.0.2.4`, where `192.0.2.4` is the recorded IPv4 Address
+  * Search by IPv6 `GET /search/ip6/::FFFF:192.0.2.4`, where `::FFFF:192.0.2.4` is the recorded IPv6 Address
 * DNS
   * Normal lookup `dig @localhost -p 5300 hostname.yourdesiredzone.local`
-  * Reverse lookup `dig @localhost -p 5300 -x 1.2.3.4`
+  * Reverse lookup `dig @localhost -p 5300 -x 192.0.2.4` or `dig @localhost -p 5300 -x ::FFFF:192.0.2.4`
 
-## Todo
-* Implement the API via AMQP, but sorry, no documentations will offered on that version.
+### Todo
+* Implement the API via AMQP, but sorry, no documentations will offered on that version because that is intended for
 
 ### Footnote
 * All Chinese (Traditional Script) and Japanese descriptions in this document are Machine-Translated Results.

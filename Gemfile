@@ -1,16 +1,16 @@
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
-gem "dotenv"
-gem "ipaddress"
-gem "json"
-gem "sequel"
+gem 'dotenv'
+gem 'ipaddress'
+gem 'json'
+gem 'sequel'
 
 # DNS Core
-gem "rubydns"
+gem 'rubydns'
 
 # API Core
-gem "sinatra"
-gem "sinatra-contrib"
+gem 'sinatra'
+gem 'sinatra-contrib'
 
 # Change your RDBMS Driver here!
-gem "mysql2"
+gem 'mysql2'

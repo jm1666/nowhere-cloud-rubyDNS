@@ -37,7 +37,32 @@ This Repository hosts a mini DNS Server, powered by Ruby + MySQL.
 * [ioquatix](https://github.com/ioquatix/), who develops [RubyDNS](https://github.com/ioquatix/rubydns)
 
 ## Documentations
-* [Broken Documentations](https://nowhere-cloud.github.io/ruby-dns/)
+* [Broken rdoc](https://nowhere-cloud.github.io/ruby-dns/), if I have time I will deal with it.
+* API
+  * Basically, send this payload to `POST /records/new` to create
+  ```json
+  {
+    "name": "hostname",
+    "ipv4address": "1.2.3.4"
+  }
+  ```
+  * Get all records `GET /records`
+  * Update records `PATCH /records/n`, where `n` is record id
+  ```json
+  {
+    "name": "hostname",
+    "ipv4address": "1.2.3.4"
+  }
+  ```
+  * Delete records `DELETE /records/n`, where `n` is record id
+  * Search by hostname `GET /search/name/abc`, where `abc` is hostname
+  * Search by IP `GET /search/ip/1.2.3.4`, where `1.2.3.4` is the recorded IP
+* DNS
+  * Normal lookup `dig @localhost -p 5300 hostname.yourdesiredzone.local`
+  * Reverse lookup `dig @localhost -p 5300 -x 1.2.3.4`
+
+## Todo
+* Implement the API via AMQP, but sorry, no documentations will offered on that version.
 
 ### Footnote
 * All Chinese (Traditional Script) and Japanese descriptions in this document are Machine-Translated Results.

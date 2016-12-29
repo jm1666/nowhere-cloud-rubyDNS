@@ -37,7 +37,7 @@ This Repository hosts a mini DNS Server, powered by Ruby + MySQL.
 * [ioquatix](https://github.com/ioquatix/), who develops [RubyDNS](https://github.com/ioquatix/rubydns)
 
 ## Documentations
-* B
+* [Broken Documentations](https://nowhere-cloud.github.io/ruby-dns/)
 
 ### Footnote
 * All Chinese (Traditional Script) and Japanese descriptions in this document are Machine-Translated Results.

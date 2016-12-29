@@ -18,11 +18,16 @@ This Repository hosts a mini DNS Server, powered by Ruby + MySQL.
 * Linux (M$ Windows から残念です、申し訳ございません) (不支援 M$ Windows)
 
 ### How To use? // 使い方 (英語のみ) // 食用方法 (English Only)
-1. Configure your `DATABASE_URL` in `.env` or Environment Varibales, and your decided RDBMS Driver in `Gemfile`
+1. Configure your decided RDBMS Driver in `Gemfile`
   * MySQL should use `mysql2`
 2. `$ bundler update`
+3. `$ rake config:create`
+4. Configure `DATABASE_URL` and various settings in `.env`
 3. `$ rake db:migrate`
 4. `$ ruby dnsd.rb`
+5. Open a new terminal, `$ rackup -p PORT`, Where PORT is any port number you like
+
+![Screenshot](screenshot.png?raw=true)
 
 ## License
 [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-nc-sa/4.0/)
@@ -32,7 +37,7 @@ This Repository hosts a mini DNS Server, powered by Ruby + MySQL.
 * [ioquatix](https://github.com/ioquatix/), who develops [RubyDNS](https://github.com/ioquatix/rubydns)
 
 ## Documentations
-* *TODO*
+* B
 
 ### Footnote
 * All Chinese (Traditional Script) and Japanese descriptions in this document are Machine-Translated Results.

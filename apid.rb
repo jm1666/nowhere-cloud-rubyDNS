@@ -44,29 +44,29 @@ class API < Sinatra::Base
         # Pre-check: are the fields here?
 
         status 409
-        json error: 'Invalid Request', description: 'The required fields are not found.'
+        json message: 'Invalid Request', description: 'The required fields are not found.'
       elsif (payload.key?('ipv4address') && payload['ipv4address'].empty?) || (payload.key?('ipv6address') && payload['ipv6address'].empty?) || (payload.key?('name') && payload['name'].empty?)
         # Pre-check: No Empty Fields
 
         status 409
-        json error: 'Invalid Request', description: 'Empty Fields discovered.'
+        json message: 'Invalid Request', description: 'Empty Fields discovered.'
       elsif !(payload['name'] =~ /^[a-zA-Z0-9][a-zA-Z0-9.-]{1,30}[a-zA-Z0-9]$/)
         # Pre-check: is this domain right?
         # http://stackoverflow.com/questions/10306690/domain-name-validation-with-regex
 
         status 409
-        json error: 'Invalid Domain', description: 'Domain rule incorrect.'
+        json message: 'Invalid Domain', description: 'Domain rule incorrect.'
       elsif !IPAddress.valid_ipv4?(payload['ipv4address']) || !IPAddress.valid_ipv6?(payload['ipv6address'])
         # Pre-check: is the IP valid?
 
         status 409
-        json error: 'Invalid Address', description: 'Not a valid IP address.'
+        json message: 'Invalid Address', description: 'Not a valid IP address.'
       else
         check_result = Records.where(name: payload['name'])
 
         if !check_result.empty?
           status 409
-          json error: 'Occupied', description: 'This Hostname has been used.'
+          json message: 'Occupied', description: 'This Hostname has been used.'
         else
           return_id = Records.insert(name: payload['name'].to_s, ipv4address: payload['ipv4address'].to_s, ipv6address: IPAddress(payload['ipv6address']).to_s)
           status 201
@@ -83,32 +83,28 @@ class API < Sinatra::Base
         # Pre-check: No Empty Fields
 
         status 409
-        json error: 'Invalid Request', description: 'Empty Fields discovered.'
+        json message: 'Invalid Request', description: 'Empty Fields discovered.'
       elsif payload.key?('name') && !(payload['name'] =~ /^[a-zA-Z0-9][a-zA-Z0-9.-]{1,30}[a-zA-Z0-9]$/)
         # Pre-check: is this domain right?
         # http://stackoverflow.com/questions/10306690/domain-name-validation-with-regex
 
         status 409
-        json error: 'Invalid Domain', description: 'Domain rule incorrect.'
+        json message: 'Invalid Domain', description: 'Domain rule incorrect.'
       elsif (payload.key?('ipv4address') && !IPAddress.valid_ipv4?(payload['ipv4address'])) || (payload.key?('ipv6address') && !IPAddress.valid_ipv6?(payload['ipv6address']))
         # Pre-check: is the IP valid?
 
         status 409
-        json error: 'Invalid Address', description: 'Not a valid IP address.'
+        json message: 'Invalid Address', description: 'Not a valid IP address.'
       else
         check_result = Records.first(id: id)
 
         if check_result.empty?
           status 404
-          json error: 'Not Found', description: 'The requested entry not found.'
+          json message: 'Not Found', description: 'The requested entry not found.'
         else
           name = payload.key?('name') ? payload['name'] : check_result['name']
           ipv4 = payload.key?('ipv4address') ? payload['ipv4address'] : check_result['ipv4address']
           ipv6 = payload.key?('ipv6address') ? IPAddress(payload['ipv6address']).to_s : check_result['ipv6address']
-          puts name
-          puts ipv4
-          puts ipv6
-          puts check_result
           json check_result.update(name: name, ipv4address: ipv4, ipv6address: ipv6)
         end
       end
@@ -130,7 +126,7 @@ class API < Sinatra::Base
         # http://stackoverflow.com/questions/10306690/domain-name-validation-with-regex
 
         status 409
-        json error: 'Invalid Domain', description: 'Domain rule incorrect.'
+        json message: 'Invalid Domain', description: 'Domain rule incorrect.'
       else
         json Records.where(name: name)
       end
@@ -141,9 +137,9 @@ class API < Sinatra::Base
         # Pre-check: is the IP valid?
 
         status 409
-        json error: 'Invalid Address', description: 'Not a valid IP address.'
+        json message: 'Invalid Address', description: 'Not a valid IP address.'
       else
-        json Records.first(ipv4address: ip)
+        json Records.where(ipv4address: ip)
       end
     end
 
@@ -152,9 +148,9 @@ class API < Sinatra::Base
         # Pre-check: is the IP valid?
 
         status 409
-        json error: 'Invalid Address', description: 'Not a valid IP address.'
+        json message: 'Invalid Address', description: 'Not a valid IP address.'
       else
-        json Records.first(ipv6address: IPAddress(ip).to_s)
+        json Records.where(ipv6address: IPAddress(ip).to_s)
       end
     end
   end

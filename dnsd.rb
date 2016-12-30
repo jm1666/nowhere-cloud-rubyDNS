@@ -83,4 +83,4 @@ class DNS
 end
 
 dns = DNS.new
-Thread.start { dns.start }.join
+dns.start

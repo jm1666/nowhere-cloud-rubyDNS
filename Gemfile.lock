@@ -13,7 +13,7 @@ GEM
     json (2.0.2)
     multi_json (1.12.1)
     mysql2 (0.4.5)
-    nio4r (1.2.1)
+    nio4r (2.0.0)
     rack (1.6.5)
     rack-protection (1.5.3)
       rack
@@ -23,7 +23,7 @@ GEM
       celluloid (= 0.16.0)
       celluloid-io (= 0.16.2)
       timers (~> 4.0.1)
-    sequel (4.41.0)
+    sequel (4.42.0)
     sinatra (1.4.7)
       rack (~> 1.5)
       rack-protection (~> 1.4)

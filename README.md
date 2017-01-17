@@ -41,6 +41,7 @@ This Repository hosts a mini DNS Server, powered by Ruby + MySQL.
   * Basically, send this payload to `POST /records/new` to create
   ```json
   {
+    "type": "A",
     "name": "hostname",
     "ipv4address": "192.0.2.4",
     "ipv6address": "::FFFF:192.0.2.4"

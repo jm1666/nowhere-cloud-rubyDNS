@@ -40,12 +40,16 @@ class API < Sinatra::Base
     post '/new' do
       payload = JSON.parse(request.body.read)
 
-      if !payload.key?('name') || !payload.key?('ipv4address') || !payload.key?('ipv6address')
+      if !payload.key?('type') || !payload.key?('name')
         # Pre-check: are the fields here?
 
         status 409
         json message: 'Invalid Request', description: 'The required fields are not found.'
-      elsif (payload.key?('ipv4address') && payload['ipv4address'].empty?) || (payload.key?('ipv6address') && payload['ipv6address'].empty?) || (payload.key?('name') && payload['name'].empty?)
+      elsif (payload.key?('type') && payload['type'].empty?) \
+         || (payload.key?('name') && payload['name'].empty?) \
+         || (payload.key?('ipv4address') && payload['ipv4address'].empty?) \
+         || (payload.key?('ipv6address') && payload['ipv6address'].empty?) \
+         || (payload.key?('cname') && payload['cname'].empty?)
         # Pre-check: No Empty Fields
 
         status 409
@@ -56,22 +60,20 @@ class API < Sinatra::Base
 
         status 409
         json message: 'Invalid Domain', description: 'Domain rule incorrect.'
-      elsif !IPAddress.valid_ipv4?(payload['ipv4address']) || !IPAddress.valid_ipv6?(payload['ipv6address'])
+      elsif !IPAddress.valid_ipv4?(payload['ipv4address']) \
+         || !IPAddress.valid_ipv6?(payload['ipv6address'])
         # Pre-check: is the IP valid?
 
         status 409
         json message: 'Invalid Address', description: 'Not a valid IP address.'
       else
-        check_result = Records.where(name: payload['name'])
-
-        if !check_result.empty?
-          status 409
-          json message: 'Occupied', description: 'This Hostname has been used.'
-        else
-          return_id = Records.insert(name: payload['name'].to_s, ipv4address: payload['ipv4address'].to_s, ipv6address: IPAddress(payload['ipv6address']).to_s)
-          status 201
-          json Records.first(id: return_id)
-        end
+        return_id = Records.insert(type: payload['type'].to_s,\
+                                   name: payload['name'].to_s,\
+                                   ipv4address: payload['ipv4address'].to_s,\
+                                   ipv6address: IPAddress(payload['ipv6address']).to_s,\
+                                   cname: payload['cname'].to_s)
+        status 201
+        json Records.first(id: return_id)
       end
     end
 
@@ -79,7 +81,15 @@ class API < Sinatra::Base
     patch '/:id' do |id|
       payload = JSON.parse(request.body.read)
 
-      if (payload.key?('ipv4address') && payload['ipv4address'].empty?) || (payload.key?('ipv6address') && payload['ipv6address'].empty?) || (payload.key?('name') && payload['name'].empty?)
+      if payload.key?('type')
+        # Updating Type is not supposed, according to design of CloudFlare
+
+        status 409
+        json message: 'Invalid Request', description: 'Changing the type of the record is not allowed.'
+      elsif (payload.key?('name') && payload['name'].empty?) \
+         || (payload.key?('ipv4address') && payload['ipv4address'].empty?) \
+         || (payload.key?('ipv6address') && payload['ipv6address'].empty?) \
+         || (payload.key?('cname') && payload['cname'].empty?)
         # Pre-check: No Empty Fields
 
         status 409
@@ -90,7 +100,8 @@ class API < Sinatra::Base
 
         status 409
         json message: 'Invalid Domain', description: 'Domain rule incorrect.'
-      elsif (payload.key?('ipv4address') && !IPAddress.valid_ipv4?(payload['ipv4address'])) || (payload.key?('ipv6address') && !IPAddress.valid_ipv6?(payload['ipv6address']))
+      elsif (payload.key?('ipv4address') && !IPAddress.valid_ipv4?(payload['ipv4address'])) \
+         || (payload.key?('ipv6address') && !IPAddress.valid_ipv6?(payload['ipv6address']))
         # Pre-check: is the IP valid?
 
         status 409
@@ -105,7 +116,8 @@ class API < Sinatra::Base
           name = payload.key?('name') ? payload['name'] : check_result['name']
           ipv4 = payload.key?('ipv4address') ? payload['ipv4address'] : check_result['ipv4address']
           ipv6 = payload.key?('ipv6address') ? IPAddress(payload['ipv6address']).to_s : check_result['ipv6address']
-          json check_result.update(name: name, ipv4address: ipv4, ipv6address: ipv6)
+          cname = payload.key?('cname') ? IPAddress(payload['cname']).to_s : check_result['cname']
+          json check_result.update(name: name, ipv4address: ipv4, ipv6address: ipv6, cname: cname)
         end
       end
     end

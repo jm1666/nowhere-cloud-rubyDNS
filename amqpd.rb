@@ -62,6 +62,7 @@ class Processor
     records = connection[:records]
     rabbit = Rabbit.new
     parsed = JSON.parse(body)
+    payload = parsed['payload']
     puts ' [x] Task : ' + parsed['task']
     msg = {
       payload: nil,
@@ -72,7 +73,7 @@ class Processor
                      when 'all'
                        records.all
                      when 'search.name'
-                       if !(parsed['payload'] =~ /^[a-zA-Z0-9][a-zA-Z0-9.-]{1,30}[a-zA-Z0-9]$/)
+                       if !(payload =~ /^[a-zA-Z0-9][a-zA-Z0-9.-]{1,30}[a-zA-Z0-9]$/)
                          # Pre-check: is this domain right?
                          # http://stackoverflow.com/questions/10306690/domain-name-validation-with-regex
 
@@ -81,27 +82,29 @@ class Processor
                          records.where(name: name)
                        end
                      when 'search.ip4'
-                       if !IPAddress.valid_ipv4?(parsed['payload'])
+                       if !IPAddress.valid_ipv4?(payload)
                          { message: 'Invalid Address', description: 'Not a valid IP address.' }
                        else
-                         records.where(ipv4address: parsed['payload'])
+                         records.where(ipv4address: payload)
                        end
                      when 'search.ip6'
-                       if !IPAddress.valid_ipv6?(ip)
+                       if !IPAddress.valid_ipv6?(payload)
                          { message: 'Invalid Address', description: 'Not a valid IP address.' }
                        else
-                         records.where(ipv6address: IPAddress(parsed['payload']).to_s)
+                         records.where(ipv6address: IPAddress(payload).to_s)
                        end
                      when 'search.id'
-                       records.first(id: parsed['payload'])
+                       records.first(id: payload)
                      when 'new'
-                       payload = parsed['payload']
-
-                       if !payload.key?('name') || !payload.key?('ipv4address') || !payload.key?('ipv6address')
+                       if !payload.key?('type') || !payload.key?('name')
                          # Pre-check: are the fields here?
 
                          { message: 'Invalid Request', description: 'The required fields are not found.' }
-                       elsif (payload.key?('ipv4address') && payload['ipv4address'].empty?) || (payload.key?('ipv6address') && payload['ipv6address'].empty?) || (payload.key?('name') && payload['name'].empty?)
+                       elsif (payload.key?('type') && payload['type'].empty?) \
+                          || (payload.key?('name') && payload['name'].empty?) \
+                          || (payload.key?('ipv4address') && payload['ipv4address'].empty?) \
+                          || (payload.key?('ipv6address') && payload['ipv6address'].empty?) \
+                          || (payload.key?('cname') && payload['cname'].empty?)
                          # Pre-check: No Empty Fields
 
                          { message: 'Invalid Request', description: 'Empty Fields discovered.' }
@@ -110,30 +113,35 @@ class Processor
                          # http://stackoverflow.com/questions/10306690/domain-name-validation-with-regex
 
                          { message: 'Invalid Domain', description: 'Domain rule incorrect.' }
-                       elsif !IPAddress.valid_ipv4?(payload['ipv4address']) || !IPAddress.valid_ipv6?(payload['ipv6address'])
+                       elsif !IPAddress.valid_ipv4?(payload['ipv4address']) \
+                          || !IPAddress.valid_ipv6?(payload['ipv6address'])
                          # Pre-check: is the IP valid?
 
                          { message: 'Invalid Address', description: 'Not a valid IP address.' }
                        else
-                         check_result = Records.where(name: payload['name'])
-
-                         if !check_result.empty?
-                           { message: 'Occupied', description: 'This Hostname has been used.' }
-                         else
-                           return_id = Records.insert(name: payload['name'].to_s, ipv4address: payload['ipv4address'].to_s, ipv6address: IPAddress(payload['ipv6address']).to_s)
-                           Records.first(id: return_id)
-                         end
+                         return_id = Records.insert(type: payload['type'].to_s,\
+                                                    name: payload['name'].to_s,\
+                                                    ipv4address: payload['ipv4address'].to_s,\
+                                                    ipv6address: IPAddress(payload['ipv6address']).to_s,\
+                                                    cname: payload['cname'].to_s)
+                         Records.first(id: return_id)
                        end
                      when 'update'
-                       payload = parsed['payload']
-
-                       if !payload.key?('id')
+                       if payload.key?('type')
+                         { message: 'Invalid Request', description: 'Changing the type of the record is not allowed.' }
+                       elsif !payload.key?('id')
                          { message: 'Invalid Request', description: 'Specify ID.' }
-                       elsif (payload.key?('id') && payload['id'].empty?) || (payload.key?('ipv4address') && payload['ipv4address'].empty?) || (payload.key?('ipv6address') && payload['ipv6address'].empty?) || (payload.key?('name') && payload['name'].empty?)
+                       elsif (payload.key?('name') && payload['name'].empty?) \
+                          || (payload.key?('ipv4address') && payload['ipv4address'].empty?) \
+                          || (payload.key?('ipv6address') && payload['ipv6address'].empty?) \
+                          || (payload.key?('cname') && payload['cname'].empty?)
+
                          { message: 'Invalid Request', description: 'Empty Fields discovered.' }
                        elsif payload.key?('name') && !(payload['name'] =~ /^[a-zA-Z0-9][a-zA-Z0-9.-]{1,30}[a-zA-Z0-9]$/)
                          { message: 'Invalid Domain', description: 'Domain rule incorrect.' }
-                       elsif (payload.key?('ipv4address') && !IPAddress.valid_ipv4?(payload['ipv4address'])) || (payload.key?('ipv6address') && !IPAddress.valid_ipv6?(payload['ipv6address']))
+                       elsif (payload.key?('ipv4address') && !IPAddress.valid_ipv4?(payload['ipv4address'])) \
+                          || (payload.key?('ipv6address') && !IPAddress.valid_ipv6?(payload['ipv6address']))
+
                          { message: 'Invalid Address', description: 'Not a valid IP address.' }
                        else
                          check_result = records.first(id: payload['id'])
@@ -144,7 +152,8 @@ class Processor
                            name = payload.key?('name') ? payload['name'] : check_result['name']
                            ipv4 = payload.key?('ipv4address') ? payload['ipv4address'] : check_result['ipv4address']
                            ipv6 = payload.key?('ipv6address') ? IPAddress(payload['ipv6address']).to_s : check_result['ipv6address']
-                           check_result.update(name: name, ipv4address: ipv4, ipv6address: ipv6)
+                           cname = payload.key?('cname') ? IPAddress(payload['cname']).to_s : check_result['cname']
+                           check_result.update(name: name, ipv4address: ipv4, ipv6address: ipv6, cname: cname)
                          end
                        end
                      when 'delete'

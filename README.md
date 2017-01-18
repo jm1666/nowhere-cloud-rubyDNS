@@ -28,10 +28,6 @@ This Repository hosts a mini DNS Server, powered by Ruby + MySQL.
 5. Open a new terminal, `$ rackup` to run the API Server. Default on port `9292`, append `-p 1234` to use port `1234`
 
 ![Screenshot](screenshot.png?raw=true)
-
-### License
-[Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-nc-sa/4.0/)
-
 ### Acknowledgements
 * Developers of [Ruby Sinatra](http://www.sinatrarb.com/)
 * [ioquatix](https://github.com/ioquatix/), who develops [RubyDNS](https://github.com/ioquatix/rubydns)

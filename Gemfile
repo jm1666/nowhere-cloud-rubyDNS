@@ -2,15 +2,22 @@ source 'https://rubygems.org'
 
 gem 'dotenv'
 gem 'ipaddress'
-gem 'json'
 gem 'sequel'
 
 # DNS Core
 gem 'rubydns'
 
 # API Core
-gem 'sinatra'
-gem 'sinatra-contrib'
+group :rest_api do
+  gem 'json'
+  gem 'sinatra'
+  gem 'sinatra-contrib'
+end
+
+# AMQP API
+group :amqp_api do
+  gem 'bunny'
+end
 
 # Change your RDBMS Driver here!
 gem 'mysql2'

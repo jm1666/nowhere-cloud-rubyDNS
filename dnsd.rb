@@ -1,13 +1,14 @@
 #!/usr/bin/env ruby
 
-require 'dotenv'
 require 'ipaddress'
 require 'rubydns'
 require 'sequel'
 
 # Dotenv
 # Load Environment Variables.
-Dotenv.load
+# Uncomment if you use it locally
+# require 'dotenv'
+# Dotenv.load
 
 # Class: Core
 # The DNS Server Core

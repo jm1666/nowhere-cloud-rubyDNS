@@ -1,2 +1,2 @@
 #!/bin/bash
-ruby dnsd.rb
+ruby /srv/dnsd.rb

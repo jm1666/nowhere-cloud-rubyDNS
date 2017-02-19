@@ -22,7 +22,7 @@ This Repository hosts a mini DNS Server, powered by Ruby + MySQL.
   * MySQL should use `mysql2`
 2. `$ bundler update`
 3. `$ rake config:create`
-4. Configure `DATABASE_URL` and various settings in `.env`
+4. Configure various settings in `.env`
 3. `$ rake db:migrate`
 4. `$ ruby dnsd.rb`
 5. Open a new terminal, `$ rackup` to run the API Server. Default on port `9292`, append `-p 1234` to use port `1234`
@@ -59,6 +59,26 @@ This Repository hosts a mini DNS Server, powered by Ruby + MySQL.
 * DNS
   * Normal lookup `dig @localhost -p 5300 hostname.yourdesiredzone.local`
   * Reverse lookup `dig @localhost -p 5300 -x 192.0.2.4` or `dig @localhost -p 5300 -x ::FFFF:192.0.2.4`
+* Docker
+  * Suggested to use in conjunction with [cosmicq/docker-bind](https://hub.docker.com/r/cosmicq/docker-bind/)
+  * [mysql](https://hub.docker.com/_/mysql/) Docker Container is REQUIRED
+```
+docker run -d \
+  -p 53:53 -p 53:53/udp \
+  -e DNS_TTL=10 \
+  -e UPSTREAM_DNS1_IP=bind \
+  -e UPSTREAM_DNS1_PORT=53 \
+  -e DNS_SUFFIX=changeme.dev \
+  -e UPSTREAM_DNS2_IP=bind \
+  -e UPSTREAM_DNS2_PORT=53 \
+  -e MYSQL_USER=your-mysql-username
+  -e MYSQL_PASS=your-mysql-password
+  -e MYSQL_DB=your-mysql-database
+  --link your-docker-bind-server-conatiner-name:bind
+  --link your-docker-mysql-server-container-name:mysql
+  --name ruby-dns \
+  jm1666/nowhere-ruby-dns
+```
 
 ### Todo
 * Implement the API via AMQP, but sorry, no documentations will offered on that version because that is intended for

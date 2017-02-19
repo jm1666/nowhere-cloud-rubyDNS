@@ -1,9 +1,11 @@
 # First Version 20170212
 FROM ruby:2.4
 
-RUN apt-get install -y ruby-mysql2
+RUN apt-get update && apt-get install -y ruby-mysql2 && apt-get clean
 
 COPY bootstrapper.sh /srv
+
+RUN chmod a+x /srv/bootstrapper.sh
 
 COPY Gemfile /srv
 

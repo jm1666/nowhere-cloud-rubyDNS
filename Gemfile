@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'dotenv'
+# gem 'dotenv'
 gem 'ipaddress'
 gem 'sequel'
 

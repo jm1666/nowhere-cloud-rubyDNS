@@ -18,13 +18,13 @@ class Core
   Name = Resolv::DNS::Name
 
   # These are meant to be useless to put at initialize, so I moved them away
-  DNS_SUFFIX    = ENV['DNS_SUFFIX'] || 'local'
-  DNS_BIND      = ENV['DNS_PORT'].to_i || 53
-  UPSTREAM_1_IP = ENV['UPSTREAM_DNS1_IP'] || '208.67.222.222'
-  UPSTREAM_1_PO = ENV['UPSTREAM_DNS1_PORT'].to_i || 53
-  UPSTREAM_2_IP = ENV['UPSTREAM_DNS2_IP'] || '208.67.220.220'
-  UPSTREAM_2_PO = ENV['UPSTREAM_DNS2_PORT'].to_i || 53
-  TTL_VALUE     = ENV['DNS_TTL'].to_i || 10
+  DNS_SUFFIX    = ENV.key?('DNS_SUFFIX')         ? ENV['DNS_SUFFIX'] : 'local'
+  DNS_BIND      = ENV.key?('DNS_PORT')           ? ENV['DNS_PORT'].to_i : 53
+  UPSTREAM_1_IP = ENV.key?('UPSTREAM_DNS1_IP')   ? ENV['UPSTREAM_DNS1_IP'] : '208.67.222.222'
+  UPSTREAM_1_PO = ENV.key?('UPSTREAM_DNS1_PORT') ? ENV['UPSTREAM_DNS1_PORT'].to_i : 53
+  UPSTREAM_2_IP = ENV.key?('UPSTREAM_DNS2_IP')   ? ENV['UPSTREAM_DNS2_IP'] : '208.67.220.220'
+  UPSTREAM_2_PO = ENV.key?('UPSTREAM_DNS2_PORT') ? ENV['UPSTREAM_DNS2_PORT'].to_i : 53
+  TTL_VALUE     = ENV.key?('DNS_TTL')            ? ENV['DNS_TTL'].to_i : 10
 
   # Confiure Binding and upstream DNS
   def initialize

@@ -77,7 +77,7 @@ docker run -d \
   --link your-docker-bind-server-conatiner-name:bind
   --link your-docker-mysql-server-container-name:mysql
   --name ruby-dns \
-  jm1666/nowhere-ruby-dns
+  jm1666/nowhere-ruby-dnsd
 ```
 
 ### Todo

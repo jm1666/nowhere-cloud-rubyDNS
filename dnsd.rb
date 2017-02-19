@@ -18,11 +18,11 @@ class Core
 
   # These are meant to be useless to put at initialize, so I moved them away
   DNS_SUFFIX    = ENV['DNS_SUFFIX'].empty? ? 'local' : ENV['DNS_SUFFIX']
-  DNS_BIND      = ENV['DNS_PORT'].empty? ? 5300 : ENV['DNS_PORT']
+  DNS_BIND      = (ENV['DNS_PORT'].empty? ? 53 : ENV['DNS_PORT']).to_i
   UPSTREAM_1_IP = ENV['UPSTREAM_DNS1_IP'].empty? ? '208.67.222.222' : ENV['UPSTREAM_DNS1_IP']
-  UPSTREAM_1_PO = ENV['UPSTREAM_DNS1_PORT'].empty? ? 53 : ENV['UPSTREAM_DNS1_PORT']
+  UPSTREAM_1_PO = (ENV['UPSTREAM_DNS1_PORT'].empty? ? 53 : ENV['UPSTREAM_DNS1_PORT']).to_i
   UPSTREAM_2_IP = ENV['UPSTREAM_DNS2_IP'].empty? ? '208.67.220.220' : ENV['UPSTREAM_DNS2_IP']
-  UPSTREAM_2_PO = ENV['UPSTREAM_DNS2_PORT'].empty? ? 53 : ENV['UPSTREAM_DNS2_PORT']
+  UPSTREAM_2_PO = (ENV['UPSTREAM_DNS2_PORT'].empty? ? 53 : ENV['UPSTREAM_DNS2_PORT']).to_i
   TTL_VALUE     = (ENV['DNS_TTL'].empty? ? 10 : ENV['DNS_TTL']).to_i
 
   # Confiure Binding and upstream DNS
@@ -36,7 +36,12 @@ class Core
 
     records = @database[:records]
     esc_dnssuffix = Regexp.escape(DNS_SUFFIX)
-    upstreamdns = RubyDNS::Resolver.new([[:udp, UPSTREAM_1, 53], [:tcp, UPSTREAM_1, 53], [:udp, UPSTREAM_2, 53], [:tcp, UPSTREAM_2, 53]])
+    upstreamdns = RubyDNS::Resolver.new([\
+                                          [:udp, UPSTREAM_1_IP, UPSTREAM_1_PO], \
+                                          [:tcp, UPSTREAM_1_IP, UPSTREAM_1_PO], \
+                                          [:udp, UPSTREAM_2_IP, UPSTREAM_2_PO], \
+                                          [:tcp, UPSTREAM_2_IP, UPSTREAM_2_PO]  \
+                                        ])
     RubyDNS.run_server(listen: [[:udp, '::', DNS_BIND], [:tcp, '::', DNS_BIND]]) do
       # Catch Localhost Request
       match(/localhost/, IN::A) do |transaction|

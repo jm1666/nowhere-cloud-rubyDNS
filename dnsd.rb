@@ -56,44 +56,60 @@ class Core
 
       # This is used to match the DNS Suffix of the internal zone
       match(/(.+)\.#{esc_dnssuffix}/, IN::A) do |transaction, match_data|
-        answers = records.where(name: match_data[1], type: 'A')
-        if answers.nil? || answers.empty?
-          transaction.fail!(:NXDomain)
-        else
-          answers.each do |answer|
-            transaction.respond!(answer[:ipv4address], ttl: TTL_VALUE)
+        begin
+          answers = records.where(name: match_data[1], type: 'A')
+          if answers.nil? || answers.empty?
+            transaction.fail!(:NXDomain)
+          else
+            answers.each do |answer|
+              transaction.respond!(answer[:ipv4address], ttl: TTL_VALUE)
+            end
           end
+        rescue Sequel::Error
+          transaction.fail!(:ServFail)
         end
       end
 
       match(/(.+)\.#{esc_dnssuffix}/, IN::AAAA) do |transaction, match_data|
-        answers = records.where(name: match_data[1], type: 'A')
-        if answers.nil? || answers.empty?
-          transaction.fail!(:NXDomain)
-        else
-          answers.each do |answer|
-            transaction.respond!(answer[:ipv6address], ttl: TTL_VALUE)
+        begin
+          answers = records.where(name: match_data[1], type: 'A')
+          if answers.nil? || answers.empty?
+            transaction.fail!(:NXDomain)
+          else
+            answers.each do |answer|
+              transaction.respond!(answer[:ipv6address], ttl: TTL_VALUE)
+            end
           end
+        rescue Sequel::Error
+          transaction.fail!(:ServFail)
         end
       end
 
       match(/(.+)\.#{esc_dnssuffix}/, IN::CNAME) do |transaction, match_data|
-        answers = records.first(name: match_data[1], type: 'CNAME')
-        if answers.nil? || answers.empty?
-          transaction.fail!(:NXDomain)
-        else
-          transaction.respond!(answer[:cname], ttl: TTL_VALUE)
+        begin
+          answers = records.first(name: match_data[1], type: 'CNAME')
+          if answers.nil? || answers.empty?
+            transaction.fail!(:NXDomain)
+          else
+            transaction.respond!(answer[:cname], ttl: TTL_VALUE)
+          end
+        rescue Sequel::Error
+          transaction.fail!(:ServFail)
         end
       end
 
       match(/(.+)\.#{esc_dnssuffix}/, IN::MX) do |transaction, match_data|
-        answers = records.where(name: match_data[1], type: 'MX')
-        if answers.nil? || answers.empty?
-          transaction.fail!(:NXDomain)
-        else
-          answers.each do |answer|
-            transaction.respond!(answer[:cname], ttl: TTL_VALUE)
+        begin
+          answers = records.where(name: match_data[1], type: 'MX')
+          if answers.nil? || answers.empty?
+            transaction.fail!(:NXDomain)
+          else
+            answers.each do |answer|
+              transaction.respond!(answer[:cname], ttl: TTL_VALUE)
+            end
           end
+        rescue
+          transaction.fail!(:ServFail)
         end
       end
 
@@ -101,13 +117,17 @@ class Core
       match(/(.+)\.in-addr.arpa/, IN::PTR) do |transaction, match_data|
         realip = match_data[1].split('.').reverse.join('.')
         if IPAddress.valid_ipv4?(realip)
-          answers = records.where(ipv4address: realip)
-          if answers.nil? || answers.empty?
-            transaction.passthrough!(upstreamdns)
-          else
-            answers.each do |answer|
-              transaction.respond!(Name.create(answer[:name] + '.' + DNS_SUFFIX), ttl: TTL_VALUE)
+          begin
+            answers = records.where(ipv4address: realip)
+            if answers.nil? || answers.empty?
+              transaction.passthrough!(upstreamdns)
+            else
+              answers.each do |answer|
+                transaction.respond!(Name.create(answer[:name] + '.' + DNS_SUFFIX), ttl: TTL_VALUE)
+              end
             end
+          rescue Sequel::Error
+            transaction.passthrough!(upstreamdns)
           end
         else
           # Refusing inappropiate requests, inappropiate IPv6 requests also goes here.
@@ -121,13 +141,17 @@ class Core
         if incoming =~ /^[0-9a-fA-F]+$/
           realip6 = IPAddress::IPv6.parse_hex(incoming).to_s
           realip4 = (IPAddress::IPv6::Mapped.new(realip6).mapped? ? '::FFFF:' + IPAddress::IPv6::Mapped.new(realip6).ipv4.address : '').to_s
-          answers = records.where(ipv6address: [realip6, realip4])
-          if answers.nil? || answers.empty?
-            transaction.passthrough!(upstreamdns)
-          else
-            answers.each do |answer|
-              transaction.respond!(Name.create(answer[:name] + '.' + DNS_SUFFIX), ttl: TTL_VALUE)
+          begin
+            answers = records.where(ipv6address: [realip6, realip4])
+            if answers.nil? || answers.empty?
+              transaction.passthrough!(upstreamdns)
+            else
+              answers.each do |answer|
+                transaction.respond!(Name.create(answer[:name] + '.' + DNS_SUFFIX), ttl: TTL_VALUE)
+              end
             end
+          rescue Sequel::Error
+            transaction.passthrough!(upstreamdns)
           end
         else
           transaction.fail!(:Refused)

@@ -1,7 +1,7 @@
 # First Version 20170212
-FROM ruby:2.4
+FROM ruby:2.4-alpine
 
-RUN apt-get update && apt-get install -y ruby-mysql2 && apt-get clean
+RUN apk add --no-cache mysql-client
 
 COPY bootstrapper.sh /srv
 
@@ -11,7 +11,7 @@ COPY Gemfile /srv
 
 COPY dnsd.rb /srv
 
-RUN BUNDLE_GEMFILE=/srv/Gemfile bundler install --without rest_api amqp_api
+RUN BUNDLE_GEMFILE=/srv/Gemfile bundler install --without rest_api amqp_api mysql2
 
 ENV DNS_TTL 10
 ENV DNS_SUFFIX nowhere.dev

@@ -20,4 +20,6 @@ group :amqp_api do
 end
 
 # Change your RDBMS Driver here!
-gem 'mysql2'
+group :mysql2 do
+  gem 'mysql2'
+end

@@ -17,7 +17,7 @@ class Core
   IN = Resolv::DNS::Resource::IN
   Name = Resolv::DNS::Name
 
-  # These are meant to be useless to put at initialize, so I moved them away
+  # Define Constants based on values saved at Environment Variables
   DNS_SUFFIX    = ENV.key?('DNS_SUFFIX')         ? ENV['DNS_SUFFIX'] : 'local'
   DNS_BIND      = ENV.key?('DNS_PORT')           ? ENV['DNS_PORT'].to_i : 53
   UPSTREAM_1_IP = ENV.key?('UPSTREAM_DNS1_IP')   ? ENV['UPSTREAM_DNS1_IP'] : '208.67.222.222'
@@ -35,7 +35,7 @@ class Core
   def start
     # These "Just copy assignment" is not preventable ...
 
-    records = @database[:records]
+    records = @database[:dns_records]
     esc_dnssuffix = Regexp.escape(DNS_SUFFIX)
     upstreamdns = RubyDNS::Resolver.new([\
                                           [:udp, UPSTREAM_1_IP, UPSTREAM_1_PO], \
@@ -66,6 +66,7 @@ class Core
             end
           end
         rescue Sequel::Error
+          deal with unavailable db
           transaction.fail!(:ServFail)
         end
       end
@@ -81,6 +82,7 @@ class Core
             end
           end
         rescue Sequel::Error
+          # Deal with unavailable db
           transaction.fail!(:ServFail)
         end
       end
@@ -94,6 +96,7 @@ class Core
             transaction.respond!(answer[:cname], ttl: TTL_VALUE)
           end
         rescue Sequel::Error
+          # Deal with unavailable DB
           transaction.fail!(:ServFail)
         end
       end
@@ -108,7 +111,8 @@ class Core
               transaction.respond!(answer[:cname], ttl: TTL_VALUE)
             end
           end
-        rescue
+        rescue Sequel::Error
+          # Deal with unavailable DB
           transaction.fail!(:ServFail)
         end
       end
@@ -127,6 +131,7 @@ class Core
               end
             end
           rescue Sequel::Error
+            # Deal with unavailable DB
             transaction.passthrough!(upstreamdns)
           end
         else
@@ -151,6 +156,7 @@ class Core
               end
             end
           rescue Sequel::Error
+            # Deal with unavailable DB
             transaction.passthrough!(upstreamdns)
           end
         else

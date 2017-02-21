@@ -1,7 +1,5 @@
 # First Version 20170212
-FROM ruby:2.4-alpine
-
-RUN apk add --no-cache mysql-client
+FROM ruby:2.4
 
 COPY bootstrapper.sh /srv
 
@@ -11,7 +9,7 @@ COPY Gemfile /srv
 
 COPY dnsd.rb /srv
 
-RUN BUNDLE_GEMFILE=/srv/Gemfile bundler install --without rest_api amqp_api mysql2
+RUN BUNDLE_GEMFILE=/srv/Gemfile bundler install --without rest_api amqp_api
 
 ENV DNS_TTL 10
 ENV DNS_SUFFIX nowhere.dev

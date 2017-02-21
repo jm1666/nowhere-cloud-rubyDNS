@@ -1,6 +1,6 @@
 Sequel.migration do
   up do
-    create_table(:records, ignore_index_errors: true) do
+    create_table(:dns_records, ignore_index_errors: true) do
       primary_key :id
       String :type, size: 4, null: false
       String :name, size: 64, null: false

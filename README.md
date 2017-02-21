@@ -60,25 +60,12 @@ This Repository hosts a mini DNS Server, powered by Ruby + MySQL.
   * Normal lookup `dig @localhost -p 5300 hostname.yourdesiredzone.local`
   * Reverse lookup `dig @localhost -p 5300 -x 192.0.2.4` or `dig @localhost -p 5300 -x ::FFFF:192.0.2.4`
 * Docker
-  * Suggested to use in conjunction with [cosmicq/docker-bind](https://hub.docker.com/r/cosmicq/docker-bind/)
-  * [mysql](https://hub.docker.com/_/mysql/) Docker Container is REQUIRED
-```
-docker run -d \
-  -p 53:53 -p 53:53/udp \
-  -e DNS_TTL=10 \
-  -e UPSTREAM_DNS1_IP=bind \
-  -e UPSTREAM_DNS1_PORT=53 \
-  -e DNS_SUFFIX=changeme.dev \
-  -e UPSTREAM_DNS2_IP=bind \
-  -e UPSTREAM_DNS2_PORT=53 \
-  -e MYSQL_USER=your-mysql-username
-  -e MYSQL_PASS=your-mysql-password
-  -e MYSQL_DB=your-mysql-database
-  --link your-docker-bind-server-conatiner-name:bind
-  --link your-docker-mysql-server-container-name:mysql
-  --name ruby-dns \
-  jm1666/nowhere-ruby-dnsd
-```
+  1. Suggested to use in conjunction with [ventz/bind](https://hub.docker.com/r/ventz/bind/)
+    * [Config File for named.conf](https://github.com/nowhere-cloud/ruby-dns/wiki/Sample-Cache-Server-Config-File)
+  2. [mysql](https://hub.docker.com/_/mysql/) Docker Container is REQUIRED to power the internal network resolver
+  3. `docker run` [command snippet](https://github.com/nowhere-cloud/ruby-dns/wiki/Docker-Run-Command)
+  4. REST/AMQP API comming soon.
+
 
 ### Todo
 * Implement the API via AMQP, but sorry, no documentations will offered on that version because that is intended for

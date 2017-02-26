@@ -2,7 +2,7 @@
 ## 概念実証：DNSサーバ
 ## 概念驗證：可動態更新的DNS Server
 
-[ ![Codeship Status for nowhere-cloud/ruby-dns](https://app.codeship.com/projects/357cff70-dab0-0134-84fb-369bc7fb7901/status?branch=master)](https://app.codeship.com/projects/203786) [![Code Climate](https://codeclimate.com/github/nowhere-cloud/ruby-dns/badges/gpa.svg)](https://codeclimate.com/github/nowhere-cloud/ruby-dns) [![Issue Count](https://codeclimate.com/github/nowhere-cloud/ruby-dns/badges/issue_count.svg)](https://codeclimate.com/github/nowhere-cloud/ruby-dns)
+[![Code Climate](https://codeclimate.com/github/nowhere-cloud/ruby-dns/badges/gpa.svg)](https://codeclimate.com/github/nowhere-cloud/ruby-dns) [![Issue Count](https://codeclimate.com/github/nowhere-cloud/ruby-dns/badges/issue_count.svg)](https://codeclimate.com/github/nowhere-cloud/ruby-dns)
 
 This Repository hosts a mini DNS Server, powered by Ruby + MySQL.
 

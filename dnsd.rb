@@ -18,13 +18,13 @@ class Core
   Name = Resolv::DNS::Name
 
   # Define Constants based on values saved at Environment Variables
-  DNS_SUFFIX    = ENV.key?('DNS_SUFFIX')         ? ENV['DNS_SUFFIX'] : 'local'
-  DNS_BIND      = ENV.key?('DNS_PORT')           ? ENV['DNS_PORT'].to_i : 53
-  UPSTREAM_1_IP = ENV.key?('UPSTREAM_DNS1_IP')   ? ENV['UPSTREAM_DNS1_IP'] : '208.67.222.222'
-  UPSTREAM_1_PO = ENV.key?('UPSTREAM_DNS1_PORT') ? ENV['UPSTREAM_DNS1_PORT'].to_i : 53
-  UPSTREAM_2_IP = ENV.key?('UPSTREAM_DNS2_IP')   ? ENV['UPSTREAM_DNS2_IP'] : '208.67.220.220'
-  UPSTREAM_2_PO = ENV.key?('UPSTREAM_DNS2_PORT') ? ENV['UPSTREAM_DNS2_PORT'].to_i : 53
-  TTL_VALUE     = ENV.key?('DNS_TTL')            ? ENV['DNS_TTL'].to_i : 10
+  DNS_SUFFIX    = ENV['DNS_SUFFIX']
+  DNS_BIND      = ENV['DNS_PORT'].to_i
+  UPSTREAM_1_IP = ENV['UPSTREAM_DNS1_IP']
+  UPSTREAM_1_PO = ENV['UPSTREAM_DNS1_PORT'].to_i
+  UPSTREAM_2_IP = ENV['UPSTREAM_DNS2_IP']
+  UPSTREAM_2_PO = ENV['UPSTREAM_DNS2_PORT'].to_i
+  TTL_VALUE     = ENV['DNS_TTL'].to_i
 
   # Confiure Binding and upstream DNS
   def initialize
@@ -66,7 +66,7 @@ class Core
             end
           end
         rescue Sequel::Error
-          deal with unavailable db
+          # deal with unavailable db
           transaction.fail!(:ServFail)
         end
       end
@@ -117,7 +117,7 @@ class Core
         end
       end
 
-      # Handling PTR Record
+      # Handling PTR Record (IP to Hostname)
       match(/(.+)\.in-addr.arpa/, IN::PTR) do |transaction, match_data|
         realip = match_data[1].split('.').reverse.join('.')
         if IPAddress.valid_ipv4?(realip)
@@ -131,7 +131,7 @@ class Core
               end
             end
           rescue Sequel::Error
-            # Deal with unavailable DB
+            # Deal with unavailable DB, Fallback to External Provider
             transaction.passthrough!(upstreamdns)
           end
         else
@@ -156,10 +156,11 @@ class Core
               end
             end
           rescue Sequel::Error
-            # Deal with unavailable DB
+            # Deal with unavailable DB, Fallback to External Provider
             transaction.passthrough!(upstreamdns)
           end
         else
+          # Refusing inappropiate requests, inappropiate IPv6 requests also goes here.
           transaction.fail!(:Refused)
         end
       end

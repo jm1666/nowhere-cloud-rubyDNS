@@ -7,4 +7,4 @@ fi
 
 export DATABASE_URL="mysql2://$MYSQL_USER:$MYSQL_PASS@mysql/$MYSQL_DB"
 
-ruby /srv/dnsd.rb
+/usr/local/bin/ruby /srv/dnsd.rb

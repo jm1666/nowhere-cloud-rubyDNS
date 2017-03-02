@@ -1,13 +1,21 @@
-# First Version 20170212
 FROM ruby:2.4
 
-COPY bootstrapper.sh /srv
+COPY bootstrapper-amqpd.sh /srv
+
+COPY bootstrapper-dnsd.sh /srv
 
 COPY Gemfile /srv
 
 COPY dnsd.rb /srv
 
-RUN chmod a+x /srv/bootstrapper.sh && BUNDLE_GEMFILE=/srv/Gemfile bundler install --without rest_api amqp_api
+COPY amqpd.rb /srv
+
+RUN chmod a+x /srv/bootstrapper-amqpd.sh \
+ && chmod a+x /srv/bootstrapper-dnsd.sh \
+ && apt-get update \
+ && apt-get install -y supervisor \
+ && apt-get clean \
+ && BUNDLE_GEMFILE=/srv/Gemfile bundler install --without rest_api
 
 EXPOSE 53/udp 53/tcp
 

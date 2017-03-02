@@ -10,6 +10,8 @@ COPY dnsd.rb /srv
 
 COPY amqpd.rb /srv
 
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
 RUN chmod a+x /srv/bootstrapper-amqpd.sh \
  && chmod a+x /srv/bootstrapper-dnsd.sh \
  && apt-get update \
@@ -31,4 +33,4 @@ ENV DNS_TTL=10 \
     UPSTREAM_DNS2_IP=208.67.220.220 \
     UPSTREAM_DNS2_PORT=53
 
-ENTRYPOINT ["/srv/bootstrapper.sh"]
+ENTRYPOINT ["/usr/bin/supervisord"]

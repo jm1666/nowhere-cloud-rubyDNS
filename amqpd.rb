@@ -1,13 +1,8 @@
 #!/usr/bin/env ruby
 
-require 'dotenv'
 require 'sequel'
 require 'ipaddress'
 require 'bunny'
-
-# Dotenv
-# Load Environment Variables from .env file
-Dotenv.load
 
 # Class: Rabbit
 # A class to manage the DNS AMQP API

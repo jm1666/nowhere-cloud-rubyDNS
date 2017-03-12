@@ -7,9 +7,9 @@ engines:
     config:
       languages:
       - ruby
-    exclude_fingerprints:
-    - a6d50c4366d341ae1ee0ddbcc80cc25c
-    - aa1e75562b31d19ca428680e8a25c581
+    checks:
+      Similar code:
+        enabled: false
   fixme:
     enabled: true
   rubocop:

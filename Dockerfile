@@ -23,4 +23,4 @@ ENV DNS_TTL=10 \
     UPSTREAM_DNS2_IP=208.67.220.220 \
     UPSTREAM_DNS2_PORT=53
 
-ENTRYPOINT ["/usr/bin/supervisord"]
+ENTRYPOINT ["/srv/bootstrapper-dnsd.sh"]
